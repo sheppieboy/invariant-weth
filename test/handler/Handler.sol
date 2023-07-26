@@ -9,4 +9,8 @@ contract Handler {
     constructor(WETH9 _weth) {
         weth = _weth;
     }
+
+    function deposit(uint256 amount) public {
+        weth.deposit{value: amount}();
+    }
 }
