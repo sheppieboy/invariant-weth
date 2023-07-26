@@ -22,8 +22,15 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     }
 
     function withdraw(uint256 amount) public {
+        amount = bound(amount, 0, weth.balanceOf(address(this)));
         weth.withdraw(amount);
     }
 
     receive() external payable {}
+
+    function sendFallBAck(uint256 amount) public {
+        amount = bound(amount, 0, address(this).balance);
+        (bool success,) = address(weth).call{value: amount}("");
+        require(success);
+    }
 }
