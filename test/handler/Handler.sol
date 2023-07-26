@@ -11,7 +11,7 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     constructor(WETH9 _weth) {
         weth = _weth;
-        deal(address(weth), 10 ether);
+        deal(address(this), 10 ether);
     }
 
     function deposit(uint256 amount) public {
