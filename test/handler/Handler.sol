@@ -20,4 +20,10 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         amount = bound(amount, 0, address(this).balance);
         weth.deposit{value: amount}();
     }
+
+    function withdraw(uint256 amount) public {
+        weth.withdraw(amount);
+    }
+
+    receive() external payable {}
 }
