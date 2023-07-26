@@ -1,1 +1,1 @@
-This is a practice for testing smart contract invariants. The smart contract used for this exercise is WETH. This exercise comes from the repo weth-invariant-testing by horsefacts, https://github.com/sheppieboy/invariant-weth.git.
+This is a practice for testing smart contract invariants. The smart contract used for this exercise is WETH. This exercise comes from the repo weth-invariant-testing by horsefacts, https://github.com/horsefacts/weth-invariant-testing.
