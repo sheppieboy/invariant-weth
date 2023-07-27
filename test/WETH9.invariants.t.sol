@@ -23,4 +23,13 @@ contract WETH9Invariants is Test {
     function invariant_solvencyDeposits() public {
         assertEq(address(weth).balance, handler.ghost_depositSum() - handler.ghost_withdrawSum());
     }
+
+    function invariant_solvencyBalances() public {
+        uint256 sumOfBalances;
+        address[] memory actors = handler.actors();
+        for (uint256 i = 0; i < actors.length; i++) {
+            sumOfBalances += weth.balanceOf(actors[i]);
+        }
+        assertEq(address(weth).balance, sumOfBalances);
+    }
 }
