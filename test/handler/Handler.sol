@@ -33,9 +33,10 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     receive() external payable {}
 
-    function sendFallBAck(uint256 amount) public {
+    function sendFallBack(uint256 amount) public {
         amount = bound(amount, 0, address(this).balance);
         (bool success,) = address(weth).call{value: amount}("");
-        require(success);
+        require(success, "sendFallback failed");
+        ghost_depositSum += amount;
     }
 }
