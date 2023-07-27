@@ -29,7 +29,6 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     function withdraw(uint256 amount) public {
         amount = bound(amount, 0, weth.balanceOf(msg.sender));
-        _pay(msg.sender, amount);
         vm.startPrank(msg.sender);
         weth.withdraw(amount);
         _pay(address(this), amount);
