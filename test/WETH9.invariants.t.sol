@@ -32,4 +32,15 @@ contract WETH9Invariants is Test {
         }
         assertEq(address(weth).balance, sumOfBalances);
     }
+
+    function invariant_depositorBalancesLessThanTotalSupply() public {
+        address[] memory actors = handler.actors();
+        for (uint256 i = 0; i < actors.length; i++) {
+            this.assertAccountBalanceLessThanTotalSupply(actors[i]);
+        }
+    }
+
+    function assertAccountBalanceLessThanTotalSupply(address account) external {
+        assertLe(weth.balanceOf(account), weth.totalSupply());
+    }
 }
