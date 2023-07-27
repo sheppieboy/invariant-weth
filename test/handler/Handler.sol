@@ -21,12 +21,14 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     function deposit(uint256 amount) public {
         amount = bound(amount, 0, address(this).balance);
+        vm.prank(msg.sender);
         weth.deposit{value: amount}();
         ghost_depositSum += amount;
     }
 
     function withdraw(uint256 amount) public {
         amount = bound(amount, 0, weth.balanceOf(address(this)));
+        vm.prank(msg.sender);
         weth.withdraw(amount);
         ghost_withdrawSum += amount;
     }
@@ -35,6 +37,7 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     function sendFallBack(uint256 amount) public {
         amount = bound(amount, 0, address(this).balance);
+        vm.prank(msg.sender);
         (bool success,) = address(weth).call{value: amount}("");
         require(success, "sendFallback failed");
         ghost_depositSum += amount;
