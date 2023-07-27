@@ -16,14 +16,19 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         deal(address(this), ETH_SUPPLY);
     }
 
+    uint256 public ghost_depositSum;
+    uint256 public ghost_withdrawSum;
+
     function deposit(uint256 amount) public {
         amount = bound(amount, 0, address(this).balance);
         weth.deposit{value: amount}();
+        ghost_depositSum += amount;
     }
 
     function withdraw(uint256 amount) public {
         amount = bound(amount, 0, weth.balanceOf(address(this)));
         weth.withdraw(amount);
+        ghost_withdrawSum += amount;
     }
 
     receive() external payable {}
