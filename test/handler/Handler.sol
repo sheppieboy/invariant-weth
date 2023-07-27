@@ -17,7 +17,10 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     uint256 public constant ETH_SUPPLY = 120_500_000 ether;
 
+    address internal currentActor;
+
     modifier createActor() {
+        currentActor = msg.sender;
         _actors.add(msg.sender);
         _;
     }
@@ -32,8 +35,8 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     function deposit(uint256 amount) public createActor {
         amount = bound(amount, 0, address(this).balance);
-        _pay(msg.sender, amount);
-        vm.prank(msg.sender);
+        _pay(currentActor, amount);
+        vm.prank(currentActor);
         weth.deposit{value: amount}();
         ghost_depositSum += amount;
     }
@@ -51,8 +54,8 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     function sendFallBack(uint256 amount) public createActor {
         amount = bound(amount, 0, address(this).balance);
-        _pay(msg.sender, amount);
-        vm.prank(msg.sender);
+        _pay(currentActor, amount);
+        vm.prank(currentActor);
         (bool success,) = address(weth).call{value: amount}("");
         require(success, "sendFallback failed");
         ghost_depositSum += amount;
