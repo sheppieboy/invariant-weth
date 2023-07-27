@@ -57,4 +57,8 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         (bool success,) = to.call{value: amount}("");
         require(success, "private pay() failed");
     }
+
+    function actors() external view returns (address[] memory) {
+        return _actors.addrs;
+    }
 }
