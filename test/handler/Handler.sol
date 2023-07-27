@@ -28,10 +28,12 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     }
 
     function withdraw(uint256 amount) public {
-        amount = bound(amount, 0, weth.balanceOf(address(this)));
+        amount = bound(amount, 0, weth.balanceOf(msg.sender));
         _pay(msg.sender, amount);
-        vm.prank(msg.sender);
+        vm.startPrank(msg.sender);
         weth.withdraw(amount);
+        _pay(address(this), amount);
+        vm.stopPrank();
         ghost_withdrawSum += amount;
     }
 
@@ -39,6 +41,7 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     function sendFallBack(uint256 amount) public {
         amount = bound(amount, 0, address(this).balance);
+        _pay(msg.sender, amount);
         vm.prank(msg.sender);
         (bool success,) = address(weth).call{value: amount}("");
         require(success, "sendFallback failed");
