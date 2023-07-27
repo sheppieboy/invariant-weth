@@ -5,8 +5,14 @@ import "../../src/WETH9.sol";
 import {CommonBase} from "forge-std/Base.sol";
 import {StdCheats} from "forge-std/StdCheats.sol";
 import {StdUtils} from "forge-std/StdUtils.sol";
+import {LibAddressSet} from "../helpers/AddressSet.sol";
+import {AddressSet} from "../helpers/AddressSet.sol";
 
 contract Handler is CommonBase, StdCheats, StdUtils {
+    using LibAddressSet for AddressSet;
+
+    AddressSet internal _actors;
+
     WETH9 public weth;
 
     uint256 public constant ETH_SUPPLY = 120_500_000 ether;
