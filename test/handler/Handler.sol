@@ -17,6 +17,11 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     uint256 public constant ETH_SUPPLY = 120_500_000 ether;
 
+    modifier createActor() {
+        _actors.add(msg.sender);
+        _;
+    }
+
     constructor(WETH9 _weth) {
         weth = _weth;
         deal(address(this), ETH_SUPPLY);
