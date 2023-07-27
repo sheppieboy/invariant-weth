@@ -30,7 +30,7 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     uint256 public ghost_depositSum;
     uint256 public ghost_withdrawSum;
 
-    function deposit(uint256 amount) public {
+    function deposit(uint256 amount) public createActor {
         amount = bound(amount, 0, address(this).balance);
         _pay(msg.sender, amount);
         vm.prank(msg.sender);
@@ -49,7 +49,7 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     receive() external payable {}
 
-    function sendFallBack(uint256 amount) public {
+    function sendFallBack(uint256 amount) public createActor {
         amount = bound(amount, 0, address(this).balance);
         _pay(msg.sender, amount);
         vm.prank(msg.sender);
