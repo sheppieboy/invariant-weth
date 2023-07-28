@@ -7,6 +7,7 @@ import {StdCheats} from "forge-std/StdCheats.sol";
 import {StdUtils} from "forge-std/StdUtils.sol";
 import {LibAddressSet} from "../helpers/AddressSet.sol";
 import {AddressSet} from "../helpers/AddressSet.sol";
+import {console} from "forge-std/console.sol";
 
 contract Handler is CommonBase, StdCheats, StdUtils {
     using LibAddressSet for AddressSet;
@@ -25,6 +26,13 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         _;
     }
 
+    mapping(bytes32 => uint256) public calls;
+
+    modifier countCall(bytes32 key) {
+        calls[key]++;
+        _;
+    }
+
     constructor(WETH9 _weth) {
         weth = _weth;
         deal(address(this), ETH_SUPPLY);
@@ -33,7 +41,7 @@ contract Handler is CommonBase, StdCheats, StdUtils {
     uint256 public ghost_depositSum;
     uint256 public ghost_withdrawSum;
 
-    function deposit(uint256 amount) public createActor {
+    function deposit(uint256 amount) public createActor countCall("deposit") {
         amount = bound(amount, 0, address(this).balance);
         _pay(currentActor, amount);
         vm.prank(currentActor);
@@ -41,8 +49,13 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         ghost_depositSum += amount;
     }
 
-    function withdraw(uint256 amount) public {
+    uint256 public ghost_zeroWithdrawals;
+
+    function withdraw(uint256 amount) public countCall("withdraw") {
         amount = bound(amount, 0, weth.balanceOf(msg.sender));
+        if (amount == 0) {
+            ghost_zeroWithdrawals++;
+        }
         vm.startPrank(msg.sender);
         weth.withdraw(amount);
         _pay(address(this), amount);
@@ -52,7 +65,7 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     receive() external payable {}
 
-    function sendFallBack(uint256 amount) public createActor {
+    function sendFallback(uint256 amount) public createActor countCall("sendFallback") {
         amount = bound(amount, 0, address(this).balance);
         _pay(currentActor, amount);
         vm.prank(currentActor);
@@ -68,5 +81,14 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     function actors() external view returns (address[] memory) {
         return _actors.addrs;
+    }
+
+    function callSummary() external view {
+        console.log("Call summary:");
+        console.log("------------------");
+        console.log("deposit", calls["deposit"]);
+        console.log("withdraw", calls["withdraw"]);
+        console.log("sendFallback", calls["sendFallback"]);
+        console.log("Zero withdrawals:", ghost_zeroWithdrawals);
     }
 }

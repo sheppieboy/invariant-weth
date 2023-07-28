@@ -32,6 +32,8 @@ contract WETH9Invariants is Test {
         }
         assertEq(address(weth).balance, sumOfBalances);
     }
+    //we'll check that no individual token owner's balance can exceed the weth.totalSupply().
+    //An underflow in token transfer logic might be one way to violate this property:
 
     function invariant_depositorBalancesLessThanTotalSupply() public {
         address[] memory actors = handler.actors();
@@ -42,5 +44,9 @@ contract WETH9Invariants is Test {
 
     function assertAccountBalanceLessThanTotalSupply(address account) external {
         assertLe(weth.balanceOf(account), weth.totalSupply());
+    }
+
+    function invariant_callSummary() public view {
+        handler.callSummary();
     }
 }
