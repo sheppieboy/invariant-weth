@@ -90,6 +90,17 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         weth.approve(spender, amount);
     }
 
+    function transfer(uint256 actorSeed, uint256 toSeed, uint256 amount)
+        public
+        useActor(actorSeed)
+        countCall("transfer")
+    {
+        address to = _actors.rand(toSeed);
+        amount = bound(amount, 0, weth.balanceOf(currentActor));
+        vm.prank(currentActor);
+        weth.transfer(to, amount);
+    }
+
     function _pay(address to, uint256 amount) private {
         (bool success,) = to.call{value: amount}("");
         require(success, "private pay() failed");
