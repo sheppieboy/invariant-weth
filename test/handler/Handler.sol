@@ -26,6 +26,11 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         _;
     }
 
+    modifier useActor(uint256 actorIndexSeed) {
+        currentActor = _actors.rand(actorIndexSeed);
+        _;
+    }
+
     mapping(bytes32 => uint256) public calls;
 
     modifier countCall(bytes32 key) {
@@ -51,12 +56,11 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     uint256 public ghost_zeroWithdrawals;
 
-    function withdraw(uint256 callerSeed, uint256 amount) public countCall("withdraw") {
-        address caller = _actors.rand(callerSeed);
-        amount = bound(amount, 0, weth.balanceOf(caller));
+    function withdraw(uint256 callerSeed, uint256 amount) public useActor(callerSeed) countCall("withdraw") {
+        amount = bound(amount, 0, weth.balanceOf(currentActor));
         if (amount == 0) ghost_zeroWithdrawals++;
 
-        vm.startPrank(caller);
+        vm.startPrank(currentActor);
         weth.withdraw(amount);
         _pay(address(this), amount);
         vm.stopPrank();
@@ -73,6 +77,17 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         (bool success,) = address(weth).call{value: amount}("");
         require(success, "sendFallback failed");
         ghost_depositSum += amount;
+    }
+
+    function approve(uint256 actorSeed, uint256 spenderSeed, uint256 amount)
+        public
+        useActor(actorSeed)
+        countCall("approve")
+    {
+        address spender = _actors.rand(spenderSeed);
+
+        vm.prank(currentActor);
+        weth.approve(spender, amount);
     }
 
     function _pay(address to, uint256 amount) private {
