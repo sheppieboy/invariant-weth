@@ -51,15 +51,16 @@ contract Handler is CommonBase, StdCheats, StdUtils {
 
     uint256 public ghost_zeroWithdrawals;
 
-    function withdraw(uint256 amount) public countCall("withdraw") {
-        amount = bound(amount, 0, weth.balanceOf(msg.sender));
-        if (amount == 0) {
-            ghost_zeroWithdrawals++;
-        }
-        vm.startPrank(msg.sender);
+    function withdraw(uint256 callerSeed, uint256 amount) public countCall("withdraw") {
+        address caller = _actors.rand(callerSeed);
+        amount = bound(amount, 0, weth.balanceOf(caller));
+        if (amount == 0) ghost_zeroWithdrawals++;
+
+        vm.startPrank(caller);
         weth.withdraw(amount);
         _pay(address(this), amount);
         vm.stopPrank();
+
         ghost_withdrawSum += amount;
     }
 
