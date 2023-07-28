@@ -21,4 +21,12 @@ library LibAddressSet {
     function count(AddressSet storage set) internal view returns (uint256) {
         return set.addrs.length;
     }
+
+    function rand(AddressSet storage set, uint256 seed) internal view returns (address) {
+        if (set.addrs.length > 0) {
+            return set.addrs[seed % set.addrs.length];
+        } else {
+            return address(0xc0ffee);
+        }
+    }
 }
