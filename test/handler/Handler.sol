@@ -101,6 +101,27 @@ contract Handler is CommonBase, StdCheats, StdUtils {
         weth.transfer(to, amount);
     }
 
+    function transferFrom(bool _approve, uint256 actorSeed, uint256 fromSeed, uint256 toSeed, uint256 amount)
+        public
+        useActor(actorSeed)
+        countCall("transferFrom")
+    {
+        address from = _actors.rand(fromSeed);
+        address to = _actors.rand(toSeed);
+
+        amount = bound(amount, 0, weth.balanceOf(from));
+
+        if (_approve) {
+            vm.prank(from);
+            weth.approve(currentActor, amount);
+        } else {
+            amount = bound(amount, 0, weth.allowance(currentActor, from));
+        }
+
+        vm.prank(currentActor);
+        weth.transferFrom(from, to, amount);
+    }
+
     function _pay(address to, uint256 amount) private {
         (bool success,) = to.call{value: amount}("");
         require(success, "private pay() failed");
